@@ -20,31 +20,11 @@ services:
     depends_on:
       random-collection-postgres:
         condition: service_healthy
-    command: ["serve", "-e", "prod", "--hostname", "${HOSTNAME}", "--port", "${PORT:-6666}"]
+    command: ["serve", "-e", "${ENV}", "--hostname", "${HOSTNAME}", "--port", "${PORT:-6666}"]
     profiles:
       - random-collection
       - all
       - mine
-    
-  migrate:
-    image: random-collection
-    build:
-      context: .
-    env_file:
-      - .env
-    command: ["migrate", "--yes"]
-    deploy:
-      replicas: 0
-
-  revert:
-    image: random-collection
-    build:
-      context: .
-    env_file:
-      - .env
-    command: ["migrate", "--revert", "--yes"]
-    deploy:
-      replicas: 0
 
   random-collection-postgres:
     image: postgres:18-alpine
