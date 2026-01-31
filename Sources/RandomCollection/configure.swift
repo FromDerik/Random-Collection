@@ -11,8 +11,8 @@ extension DatabaseID {
 
 // configures your application
 public func configure(_ app: Application) async throws {
-    app.http.server.configuration.hostname = "0.0.0.0"
-    app.http.server.configuration.port = Environment.get("PORT").flatMap { Int.init($0) } ?? 4311
+    app.http.server.configuration.hostname = Environment.get("HOSTNAME") ?? "localhost"
+    app.http.server.configuration.port = Environment.get("PORT").flatMap { Int.init($0) } ?? 6666
     // serve files from /Public folder
     app.middleware.use(FileMiddleware(publicDirectory: app.directory.publicDirectory))
 
@@ -31,11 +31,7 @@ public func configure(_ app: Application) async throws {
     app.migrations.add(CreateList())
     app.migrations.add(CreateEntry())
 
-//    app.migrations.add(JobModelMigration())
-//    
-//    app.queues.configuration.refreshInterval = .seconds(5)
-//    app.queues.configuration.workerCount = 1
-//    app.queues.use(.fluent(.queues))
+    try await app.autoMigrate()
 
     app.views.use(.leaf)
     app.caches.use(.memory)
