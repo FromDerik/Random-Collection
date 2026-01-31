@@ -11,6 +11,7 @@ extension DatabaseID {
 
 // configures your application
 public func configure(_ app: Application) async throws {
+    app.logger.logLevel = .init(Environment.get("LOG_LEVEL") ?? "INFO") ?? .info
     app.http.server.configuration.hostname = Environment.get("HOSTNAME") ?? "localhost"
     app.http.server.configuration.port = Environment.get("PORT").flatMap { Int.init($0) } ?? 6666
     // serve files from /Public folder
@@ -38,7 +39,6 @@ public func configure(_ app: Application) async throws {
     
     switch app.environment {
     case .development:
-        app.logger.logLevel = .debug
         app.middleware.use(CORSMiddleware(), at: .beginning)
     default:
         break
