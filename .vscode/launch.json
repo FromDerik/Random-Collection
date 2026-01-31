@@ -1,0 +1,24 @@
+{
+    "configurations": [
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:random-collection}",
+            "name": "Debug RandomCollection",
+            "target": "RandomCollection",
+            "configuration": "debug",
+            "preLaunchTask": "swift: Build Debug RandomCollection"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:random-collection}",
+            "name": "Release RandomCollection",
+            "target": "RandomCollection",
+            "configuration": "release",
+            "preLaunchTask": "swift: Build Release RandomCollection"
+        }
+    ]
+}
