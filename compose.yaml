@@ -4,24 +4,23 @@ services:
     image: random-collection
     container_name: random-collection
     restart: unless-stopped
+    expose:
+      - ${PORT:-6666}
     env_file:
       - .env
-    ports: # Comment Out if using Traefik
-      - '${PORT:-4311}:${PORT:-4311}'
-    # expose:             # Uncomment if using Traefik
-    #   - ${PORT:-6666}
-    # labels:
-    #   - "traefik.enabled=true"
-    #   - "traefik.http.routers.random-collection.rule=Host('${RC_HOSTNAME?}')"
-    #   - "traefik.http.routers.random-collection.entrypoint=websecure"
-    #   - "traefik.http.routers.random-collection.tls.certresolver=letsencrypt"
-    #   - "traefik.http.routers.random-collection.middlewares=authelia@docker"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.random-collection.rule=Host(`${RANDOM_COLLECTION_HOSTNAME?}`)"
+      - "traefik.http.routers.random-collection.entrypoints=websecure"
+      - "traefik.http.routers.random-collection.tls.certresolver=letsencrypt"
+      # - "traefik.http.routers.random-collection.middlewares=authelia@docker"
+      - "traefik.http.services.random-collection.loadbalancer.server.port=${PORT:-6666}"
     volumes:
       - ${DOCKER_DATA_DIR}/random-collection/data:/app/data
     depends_on:
       random-collection-postgres:
         condition: service_healthy
-    command: ["serve", "-e", "${ENV:-dev}", "--hostname", "${HOSTNAME}", "--port", "${PORT:-4311}"]
+    command: ["serve", "-e", "prod", "--hostname", "${HOSTNAME}", "--port", "${PORT:-6666}"]
     profiles:
       - random-collection
       - all
@@ -36,6 +35,7 @@ services:
     command: ["migrate", "--yes"]
     deploy:
       replicas: 0
+
   revert:
     image: random-collection
     build:
@@ -45,6 +45,7 @@ services:
     command: ["migrate", "--revert", "--yes"]
     deploy:
       replicas: 0
+
   random-collection-postgres:
     image: postgres:18-alpine
     container_name: random-collection-postgres
@@ -64,5 +65,3 @@ services:
       - random-collection
       - all
       - mine
-    ports:
-      - '5432:5432'
